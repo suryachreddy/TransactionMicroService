@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class DepositMoneyEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private long accountNumber;
     private Double lastCreditedAmount;
