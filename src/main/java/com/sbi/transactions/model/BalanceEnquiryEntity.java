@@ -7,12 +7,13 @@ import javax.persistence.*;
 @Entity
 @Data
 @Table(name = "BALANCE_ENQUIRY")
-public class DepositMoneyEntity {
+public class BalanceEnquiryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private long accountNumber;
     private Double lastCreditedAmount;
     private Double availableBalance;
+    private String email;
 }

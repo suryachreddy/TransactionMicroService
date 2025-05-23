@@ -1,8 +1,10 @@
 package com.sbi.transactions.service;
 
-import com.sbi.transactions.model.DepositMoneyEntity;
-import com.sbi.transactions.model.DepositMoneyRequest;
-import com.sbi.transactions.repository.DepositMoneyRepository;
+import com.sbi.transactions.model.AccountDetails;
+import com.sbi.transactions.model.BalanceEnquiryEntity;
+import com.sbi.transactions.model.BalanceEnquiryRequest;
+import com.sbi.transactions.model.BalanceEnquiryResponse;
+import com.sbi.transactions.repository.BalanceEnquiryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,35 +12,54 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.sbi.transactions.constants.ApiConstants.DEPOSIT_SUCCESSFUL;
-import static com.sbi.transactions.constants.ApiConstants.INVALID_ACCOUNT_NUMBER;
+import static com.sbi.transactions.constants.ApiConstants.*;
 
 @Slf4j
 @Service
 public class TransactionsService {
 
     @Autowired
-     private DepositMoneyRepository moneyRepository;
+    private BalanceEnquiryRepository repository;
 
     ModelMapper modelMapper = new ModelMapper();
 
-    public String depositMoney(DepositMoneyRequest moneyRequest) {
+    public String depositMoney(BalanceEnquiryRequest moneyRequest) {
         //fetch available balance
-        Optional<DepositMoneyEntity> moneyEntity = moneyRepository.findByAccountNumber(moneyRequest.getAccountNumber());
+        Optional<BalanceEnquiryEntity> moneyEntity = repository.findByAccountNumber(moneyRequest.getAccountNumber());
         if (!(moneyEntity.isPresent())) {
             log.info(INVALID_ACCOUNT_NUMBER);
             return INVALID_ACCOUNT_NUMBER;
         }
-        DepositMoneyEntity existDepositMoneyEntity = moneyEntity.get();
+        BalanceEnquiryEntity existDepositMoneyEntity = moneyEntity.get();
         existDepositMoneyEntity.setLastCreditedAmount(moneyRequest.getLastCreditedAmount());
         existDepositMoneyEntity.setAvailableBalance(calculateAvailableBalance(existDepositMoneyEntity, moneyRequest));
-        moneyRepository.save(existDepositMoneyEntity);
-        log.info("money deposited successfully!!!");
+        repository.save(existDepositMoneyEntity);
+        log.info("Money deposited successfully!!!");
         return moneyRequest.getLastCreditedAmount() + DEPOSIT_SUCCESSFUL;
     }
 
-    private double calculateAvailableBalance(DepositMoneyEntity existDepositMoneyEntity, DepositMoneyRequest moneyRequest) {
+    private double calculateAvailableBalance(BalanceEnquiryEntity existDepositMoneyEntity, BalanceEnquiryRequest moneyRequest) {
         return Optional.ofNullable(existDepositMoneyEntity.getAvailableBalance()).orElse(0.0) +
                 Optional.ofNullable(moneyRequest.getLastCreditedAmount()).orElse(0.0);
+    }
+
+    public String saveAccountDetails(AccountDetails accountDetails) {
+        BalanceEnquiryEntity balanceEnquiry = new BalanceEnquiryEntity();
+        balanceEnquiry.setAccountNumber(accountDetails.getAccountNumber());
+        balanceEnquiry.setEmail(accountDetails.getEmail());
+        repository.save(balanceEnquiry);
+        log.info(ACCOUNT_DETAILS_SAVED_SUCCESSFULLY);
+        return ACCOUNT_DETAILS_SAVED_SUCCESSFULLY;
+    }
+
+    public BalanceEnquiryResponse balanceEnquiryResponse(String email) {
+        BalanceEnquiryResponse balanceEnquiryResponse = null;
+        Optional<BalanceEnquiryEntity> optionalBalanceEnquiryEntity = repository.findByEmail(email);
+        if (optionalBalanceEnquiryEntity.isPresent()) {
+            BalanceEnquiryEntity balanceEnquiry = optionalBalanceEnquiryEntity.get();
+            balanceEnquiryResponse = modelMapper.map(balanceEnquiry, BalanceEnquiryResponse.class);
+        }
+        log.info("account details : {}", balanceEnquiryResponse);
+        return balanceEnquiryResponse;
     }
 }
