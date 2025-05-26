@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 import static com.sbi.transactions.constants.ApiConstants.*;
@@ -61,5 +62,23 @@ public class TransactionsService {
         }
         log.info("account details : {}", balanceEnquiryResponse);
         return balanceEnquiryResponse;
+    }
+
+    @Transactional
+    public String deleteAccount(String email) {
+      Optional<BalanceEnquiryEntity> optionalBalance  = repository.findByEmail(email);
+      if (optionalBalance.isPresent()) {
+          BalanceEnquiryEntity balanceEnquiry = optionalBalance.get();
+          if (null != balanceEnquiry.getAvailableBalance() && balanceEnquiry.getAvailableBalance() > 0) {
+              log.info(ACCOUNT_DELETION_MESSAGE);
+              return ACCOUNT_DELETION_MESSAGE;
+          }
+          repository.deleteByEmail(email);
+          log.info(ACCOUNT_DELETED_SUCCESSFULLY);
+      } else {
+          log.info(INVALID_EMAIL);
+          return INVALID_EMAIL;
+      }
+      return ACCOUNT_DELETED_SUCCESSFULLY;
     }
 }

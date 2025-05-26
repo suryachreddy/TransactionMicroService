@@ -12,4 +12,6 @@ public interface BalanceEnquiryRepository extends JpaRepository<BalanceEnquiryEn
     Optional<BalanceEnquiryEntity> findByAccountNumber(long accountNumber);
 
     Optional<BalanceEnquiryEntity> findByEmail(String email);
+
+    void deleteByEmail(String email);
 }

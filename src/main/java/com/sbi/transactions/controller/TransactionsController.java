@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.sbi.transactions.constants.ApiConstants.INVALID_ACCOUNT_NUMBER;
+import static com.sbi.transactions.constants.ApiConstants.*;
 
 @RestController
 @Slf4j
@@ -39,6 +39,16 @@ public class TransactionsController {
     public ResponseEntity<BalanceEnquiryResponse> getAccountDetails(@PathVariable String email) {
         log.info("Request received for account details :{}", email);
         BalanceEnquiryResponse response = transactionsService.balanceEnquiryResponse(email);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/account/{email}")
+    public ResponseEntity<Object> deleteAccount(@PathVariable String email) {
+        log.info("Request received for account deletion, email-id :{}", email);
+        String response = transactionsService.deleteAccount(email);
+        if (response.equals(ACCOUNT_DELETION_MESSAGE) || response.equals(INVALID_EMAIL)) {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
