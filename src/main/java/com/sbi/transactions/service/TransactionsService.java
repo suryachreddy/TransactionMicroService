@@ -5,12 +5,12 @@ import com.sbi.transactions.model.BalanceEnquiryEntity;
 import com.sbi.transactions.model.BalanceEnquiryRequest;
 import com.sbi.transactions.model.BalanceEnquiryResponse;
 import com.sbi.transactions.repository.BalanceEnquiryRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 import static com.sbi.transactions.constants.ApiConstants.*;
