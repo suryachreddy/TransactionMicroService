@@ -26,8 +26,6 @@ public class SpringBatchConfig {
 	@Autowired
 	private PersonRepository personRepository;
 
-
-
 	@Bean
 	public FlatFileItemReader<Person> reader() {
 		return new FlatFileItemReaderBuilder<Person>()
