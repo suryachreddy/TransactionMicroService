@@ -27,7 +27,7 @@ public class TransactionsService {
     public String depositMoney(BalanceEnquiryRequest moneyRequest) {
         //fetch available balance
         Optional<BalanceEnquiryEntity> moneyEntity = repository.findByAccountNumber(moneyRequest.getAccountNumber());
-        if (!(moneyEntity.isPresent())) {
+        if (moneyEntity.isEmpty()) {
             log.info(INVALID_ACCOUNT_NUMBER);
             return INVALID_ACCOUNT_NUMBER;
         }
